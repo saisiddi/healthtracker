@@ -1,4 +1,4 @@
-// server.js (Groq + Supabase version)
+// server.js (Groq + Supabase + ElevenLabs version)
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
@@ -7,6 +7,7 @@ import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { createClient } from '@supabase/supabase-js';
+import { ElevenLabsClient } from '@elevenlabs/elevenlabs-js';
 
 dotenv.config();
 
@@ -50,6 +51,20 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
   console.log('✅ Supabase connected successfully');
 } else {
   console.warn('⚠️  Supabase credentials not found. Database features disabled.');
+}
+
+// ElevenLabs configuration
+const ELEVENLABS_API_KEY = 'sk_648b7226da0f7b9b588506f4a19658299d85a579209bbb98'; // Force new API key
+const ELEVENLABS_VOICE_ID = process.env.ELEVENLABS_VOICE_ID || 'CpLFIATEbkaZdJr01erZ';
+
+if (ELEVENLABS_API_KEY) {
+  // Log masked API key for verification (first 10 and last 4 chars)
+  const maskedKey = ELEVENLABS_API_KEY.length > 14
+    ? `${ELEVENLABS_API_KEY.substring(0, 10)}...${ELEVENLABS_API_KEY.substring(ELEVENLABS_API_KEY.length - 4)}`
+    : '***';
+  console.log(`✅ ElevenLabs API key configured (${maskedKey})`);
+} else {
+  console.warn('⚠️  ElevenLabs API key not found. Text-to-speech disabled.');
 }
 
 // Helper function to call Groq API
@@ -100,7 +115,7 @@ function validateImageData(imageBase64, mimeType) {
   const base64Regex = /^[A-Za-z0-9+/=]+$/;
   const dataStripped = imageBase64.replace(/^data:[^;]+;base64,/, '');
   const cleanedBase64 = dataStripped.replace(/\s+/g, '');
-  
+
   if (!base64Regex.test(cleanedBase64)) {
     return { valid: false, error: 'Invalid base64 image data' };
   }
@@ -130,13 +145,13 @@ function validateImageData(imageBase64, mimeType) {
 // Helper function to extract JSON from text
 function extractJsonBlock(s) {
   if (!s) return null;
-  
+
   // Try to find a code block with json
   const codeBlockMatch = s.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
   if (codeBlockMatch) {
     return codeBlockMatch[1].trim();
   }
-  
+
   // Try to find a JSON object
   const jsonMatch = s.match(/\{[\s\S]*\}/);
   return jsonMatch ? jsonMatch[0] : null;
@@ -167,14 +182,24 @@ async function saveAnalysis(analysisData) {
       .single();
 
     if (error) {
-      console.error('Error saving to database:', error);
+      // Check if it's a table missing error - log as warning, not error
+      if (error.code === 'PGRST205' || error.message?.includes('table') || error.message?.includes('schema cache')) {
+        console.warn('⚠️  Database table not found. Please run the SQL schema in Supabase. Analysis will continue without saving.');
+      } else {
+        console.error('Error saving to database:', error);
+      }
       return null;
     }
 
     console.log('✅ Analysis saved to database with ID:', data.id);
     return data;
   } catch (err) {
-    console.error('Database save error:', err);
+    // Check if it's a table missing error
+    if (err.code === 'PGRST205' || err.message?.includes('table') || err.message?.includes('schema cache')) {
+      console.warn('⚠️  Database table not found. Please run the SQL schema in Supabase. Analysis will continue without saving.');
+    } else {
+      console.error('Database save error:', err);
+    }
     return null;
   }
 }
@@ -244,6 +269,150 @@ app.get('/stats', async (req, res) => {
   }
 });
 
+// Text-to-Speech endpoint using direct REST API
+app.post('/text-to-speech', async (req, res) => {
+  console.log('📥 TTS request received');
+
+  if (!ELEVENLABS_API_KEY) {
+    console.error('❌ ElevenLabs not configured');
+    return res.status(503).json({ error: 'Text-to-speech not configured' });
+  }
+
+  try {
+    const { text } = req.body;
+
+    if (!text || typeof text !== 'string') {
+      console.error('❌ Invalid text parameter');
+      return res.status(400).json({ error: 'Text is required' });
+    }
+
+    // Limit text length to prevent abuse and quota exhaustion
+    if (text.length > 5000) {
+      console.error('❌ Text too long:', text.length);
+      return res.status(400).json({ error: 'Text too long (max 5000 characters)' });
+    }
+
+    // AGGRESSIVE quota management - send only minimal essential text
+    let optimizedText = text;
+    
+    // Always optimize text to prevent quota issues - be very conservative
+    if (text.length > 200) {
+      console.log('📝 Applying aggressive TTS optimization for quota protection...');
+      
+      // Extract only the most critical summary (first sentence or two)
+      const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 0);
+      if (sentences.length > 0) {
+        optimizedText = sentences[0].trim() + '.';
+        
+        // If still too long, truncate further
+        if (optimizedText.length > 150) {
+          optimizedText = optimizedText.substring(0, 147) + '...';
+        }
+        
+        console.log(`✂️ Aggressively optimized text from ${text.length} to ${optimizedText.length} characters`);
+      } else {
+        // Fallback: just take first 100 characters
+        optimizedText = text.substring(0, 97) + '...';
+      }
+    }
+    
+    // Ultra-conservative final safety check
+    if (optimizedText.length > 150) {
+      optimizedText = optimizedText.substring(0, 147) + '...';
+    }
+
+    console.log(`🔊 Generating speech for ${optimizedText.length} characters (original: ${text.length})...`);
+    console.log(`📝 Text preview: "${text.substring(0, 100)}..."`);
+    console.log(`🎤 Voice ID: ${ELEVENLABS_VOICE_ID}`);
+
+    // Use direct REST API instead of SDK
+    console.log('Calling ElevenLabs REST API...');
+
+    const elevenLabsUrl = `https://api.elevenlabs.io/v1/text-to-speech/${ELEVENLABS_VOICE_ID}`;
+
+    const elevenLabsResponse = await fetch(elevenLabsUrl, {
+      method: 'POST',
+      headers: {
+        'Accept': 'audio/mpeg',
+        'Content-Type': 'application/json',
+        'xi-api-key': ELEVENLABS_API_KEY
+      },
+      body: JSON.stringify({
+        text: optimizedText,
+        model_id: 'eleven_turbo_v2_5',
+        voice_settings: {
+          stability: 0.5,
+          similarity_boost: 0.75,
+          style: 0.0,
+          use_speaker_boost: true
+        }
+      })
+    });
+
+    console.log('📡 ElevenLabs response status:', elevenLabsResponse.status);
+
+    if (!elevenLabsResponse.ok) {
+      const errorText = await elevenLabsResponse.text();
+      console.error('❌ ElevenLabs API Error:', errorText);
+
+      // Parse error to check for quota issues
+      let errorDetails;
+      try {
+        errorDetails = JSON.parse(errorText);
+      } catch (e) {
+        errorDetails = { message: errorText };
+      }
+
+      // Handle quota exceeded gracefully
+      if (errorDetails.detail?.status === 'quota_exceeded' || errorText.includes('quota_exceeded')) {
+        console.warn('⚠️  ElevenLabs quota exceeded. Returning error response.');
+        return res.status(402).json({
+          error: 'Text-to-speech quota exceeded',
+          details: errorDetails.detail?.message || 'Your ElevenLabs API quota has been exceeded. Please upgrade your plan or wait for quota reset.',
+          quota_exceeded: true
+        });
+      }
+
+      // Handle other API errors
+      return res.status(elevenLabsResponse.status).json({
+        error: 'Text-to-speech service unavailable',
+        details: errorDetails.detail?.message || errorDetails.message || 'ElevenLabs API returned an error',
+        status_code: elevenLabsResponse.status
+      });
+    }
+
+    const audioBuffer = Buffer.from(await elevenLabsResponse.arrayBuffer());
+
+    console.log(`✅ Generated ${audioBuffer.length} bytes of audio`);
+
+    if (audioBuffer.length === 0) {
+      throw new Error('Generated audio is empty');
+    }
+
+    // Send audio as response
+    res.set({
+      'Content-Type': 'audio/mpeg',
+      'Content-Length': audioBuffer.length,
+      'Cache-Control': 'public, max-age=3600',
+      'Accept-Ranges': 'bytes'
+    });
+    res.send(audioBuffer);
+
+  } catch (err) {
+    console.error('❌ Text-to-speech error:', err);
+    console.error('Error details:', err.stack);
+
+    // Don't send response if already sent
+    if (!res.headersSent) {
+      res.status(500).json({
+        error: 'Failed to generate speech',
+        details: err.message,
+        stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
+      });
+    }
+  }
+});
+
 app.post('/analyze', async (req, res) => {
   try {
     const { imageBase64, mimeType, modality } = req.body || {};
@@ -251,7 +420,7 @@ app.post('/analyze', async (req, res) => {
     // Validate input data
     const validation = validateImageData(imageBase64, mimeType);
     if (!validation.valid) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         error: 'Invalid image data',
         detail: validation.error
       });
@@ -259,9 +428,9 @@ app.post('/analyze', async (req, res) => {
 
     const allowedModalities = ['xray', 'blood_test', 'prescription'];
     if (!modality || !allowedModalities.includes(modality)) {
-      return res.status(400).json({ 
-        error: 'Invalid modality', 
-        detail: 'Select one of: xray, blood_test, prescription' 
+      return res.status(400).json({
+        error: 'Invalid modality',
+        detail: 'Select one of: xray, blood_test, prescription'
       });
     }
 
@@ -271,50 +440,43 @@ app.post('/analyze', async (req, res) => {
     const imageInlinePart = { inlineData: { data: dataStripped, mimeType } };
 
     // Handle PDF input by extracting text (first pages) and skipping image part
+    // Note: PDF support requires pdf-parse package. Currently disabled as validation only allows images.
     let isPdf = mimeType === 'application/pdf';
     let pdfText = '';
     if (isPdf) {
       if (modality === 'xray') {
         return res.status(400).json({ error: 'Unsupported input', detail: 'For X-ray, please upload an image (PNG/JPG), not a PDF.' });
       }
-      try {
-        const buf = Buffer.from(dataStripped, 'base64');
-        const parsed = await pdfParse(buf);
-        pdfText = (parsed.text || '').trim();
-        if (!pdfText || pdfText.length < 10) {
-          return res.status(400).json({ error: 'PDF has no readable text', detail: 'Please upload a PDF with selectable text or use a clear image instead.' });
-        }
-      } catch (e) {
-        return res.status(400).json({ error: 'Failed to parse PDF', detail: String(e.message || e) });
-      }
+      // PDF parsing is not currently supported (pdf-parse not installed)
+      return res.status(400).json({ error: 'PDF support not available', detail: 'Please upload an image (PNG/JPG) instead of a PDF.' });
     }
 
     // OCR pass: extract text if present
     async function runOCR() {
       const ocrPrompt = `Extract all legible text from the supplied image as plain text (preserve important numbers/units like mg/dL, mmHg). Output strict JSON only:\n{\n  "has_text": boolean,\n  "ocr_text": string\n}`;
-      
+
       try {
         const messages = [
           {
             role: 'user',
             content: [
               { type: 'text', text: ocrPrompt },
-              { 
-                type: 'image_url', 
-                image_url: { 
-                  url: `data:${mimeType};base64,${dataStripped}` 
-                } 
+              {
+                type: 'image_url',
+                image_url: {
+                  url: `data:${mimeType};base64,${dataStripped}`
+                }
               }
             ]
           }
         ];
-        
+
         const text = await callGroqAPI(messages, {
           temperature: 0.0,
           maxTokens: 2048,
           responseFormat: { type: 'json_object' }
         });
-        
+
         try {
           const parsed = JSON.parse(text);
           return {
@@ -408,16 +570,16 @@ IMPORTANT: Be thorough and specific. Include actual numbers, measurements, and v
           role: 'user',
           content: [
             { type: 'text', text: textContent },
-            { 
-              type: 'image_url', 
-              image_url: { 
-                url: `data:${mimeType};base64,${dataStripped}` 
-              } 
+            {
+              type: 'image_url',
+              image_url: {
+                url: `data:${mimeType};base64,${dataStripped}`
+              }
             }
           ]
         }
       ];
-      
+
       return await callGroqAPI(messages, {
         temperature: 0.0,
         maxTokens: 2048,
@@ -440,11 +602,11 @@ IMPORTANT: Be thorough and specific. Include actual numbers, measurements, and v
       }
     }
 
-    // Run main analysis (no model fallback, always gemini-2.5-pro)
+    // Run main analysis
     let text;
     try {
       console.log(`[ANALYZE] Using model=${modelForThis}, modality=${modality}`);
-      text = await analyzeWithModel(modelForThis, ocr);
+      text = await analyzeWithModel(ocr);
     } catch (error) {
       console.error('Analysis failed:', error);
       return res.status(502).json({ error: 'Analysis failed', detail: error.message || String(error) });
@@ -474,13 +636,13 @@ IMPORTANT: Be thorough and specific. Include actual numbers, measurements, and v
     // If still not parsed, log the raw response and try to convert to strict JSON
     if (!parsed) {
       console.error('Failed to parse response as JSON. Raw response:', text);
-      
+
       // Try to clean up the response text
       let cleanedText = (text || '').trim();
-      
+
       // Remove markdown code blocks if present
       cleanedText = cleanedText.replace(/^```(?:json)?\s*|```$/g, '').trim();
-      
+
       // Try to parse again with cleaned text
       try {
         parsed = JSON.parse(cleanedText);
@@ -497,7 +659,7 @@ IMPORTANT: Be thorough and specific. Include actual numbers, measurements, and v
               content: `Convert the following assistant output into strict JSON matching this schema. Return ONLY JSON.\nSchema:\n${schemaHint}\n\nAssistant output:\n${(text || '').slice(0, 12000)}`
             }
           ];
-          
+
           const convText = await callGroqAPI(messages, {
             temperature: 0,
             maxTokens: 512,
@@ -542,8 +704,8 @@ IMPORTANT: Be thorough and specific. Include actual numbers, measurements, and v
         throw new Error('Failed to parse AI response');
       }
 
-      const severity = ['green', 'yellow', 'red'].includes(parsed.severity) 
-        ? parsed.severity 
+      const severity = ['green', 'yellow', 'red'].includes(parsed.severity)
+        ? parsed.severity
         : 'yellow';
       const modalityOut = ['xray', 'blood_test', 'prescription', 'other'].includes(parsed.modality)
         ? parsed.modality
@@ -588,14 +750,14 @@ IMPORTANT: Be thorough and specific. Include actual numbers, measurements, and v
         } : 'No request body',
         timestamp: new Date().toISOString()
       });
-      
+
       // Provide more detailed error information in development
-      const errorDetail = process.env.NODE_ENV === 'development' 
+      const errorDetail = process.env.NODE_ENV === 'development'
         ? `Error: ${err.message}\n${err.stack}`
         : 'An error occurred while processing your request. Please try again with a different image.';
-        
-      res.status(500).json({ 
-        error: 'Failed to analyze image', 
+
+      res.status(500).json({
+        error: 'Failed to analyze image',
         detail: errorDetail,
         timestamp: new Date().toISOString()
       });

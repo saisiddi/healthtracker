@@ -9,6 +9,7 @@
     "dev": "NODE_ENV=development nodemon server.js"
   },
   "dependencies": {
+    "@elevenlabs/elevenlabs-js": "^2.25.0",
     "@google/generative-ai": "^0.19.0",
     "@supabase/supabase-js": "^2.84.0",
     "cors": "^2.8.5",
