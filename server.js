@@ -1,4 +1,4 @@
-// server.js (Groq + Supabase + ElevenLabs version)
+// server.js (Groq + Supabase version with Groq TTS)
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
@@ -7,7 +7,6 @@ import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { createClient } from '@supabase/supabase-js';
-import { ElevenLabsClient } from '@elevenlabs/elevenlabs-js';
 
 dotenv.config();
 
@@ -17,7 +16,32 @@ const __dirname = path.dirname(__filename);
 const app = express();
 
 // Security and middleware
-app.use(helmet());
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      useDefaults: true,
+      directives: {
+        "default-src": ["'self'"],
+        "base-uri": ["'self'"],
+        "font-src": ["'self'", "https:", "data:"],
+        "form-action": ["'self'"],
+        "frame-ancestors": ["'self'"],
+        "img-src": ["'self'", "data:"],
+        "object-src": ["'none'"],
+        "script-src": ["'self'"],
+        "script-src-attr": ["'none'"],
+        "style-src": ["'self'", "https:", "'unsafe-inline'"],
+        // Allow media loaded from our origin and blob: URLs for audio playback
+        "media-src": ["'self'", "blob:"],
+        // Allow API calls to Groq
+        "connect-src": ["'self'", "https://api.groq.com"],
+        // Optional: upgrade-insecure-requests is enabled by defaults
+      }
+    },
+    crossOriginOpenerPolicy: { policy: "same-origin" },
+    crossOriginResourcePolicy: { policy: "same-origin" }
+  })
+);
 app.use(cors({ origin: true }));
 app.use(express.json({ limit: '25mb' }));
 app.use(morgan('dev'));
@@ -53,19 +77,13 @@ if (SUPABASE_URL && SUPABASE_ANON_KEY) {
   console.warn('⚠️  Supabase credentials not found. Database features disabled.');
 }
 
-// ElevenLabs configuration
-const ELEVENLABS_API_KEY = 'sk_648b7226da0f7b9b588506f4a19658299d85a579209bbb98'; // Force new API key
-const ELEVENLABS_VOICE_ID = process.env.ELEVENLABS_VOICE_ID || 'CpLFIATEbkaZdJr01erZ';
+// Groq TTS configuration (using the same API key as chat)
+// PlayAI voices: Jennifer, Mason, Ruby, Angelo, Atlas, Celeste, and more
+// See: https://console.groq.com/docs/speech-text
+const GROQ_TTS_VOICE = process.env.GROQ_TTS_VOICE || 'Jennifer-PlayAI';
+const GROQ_TTS_MODEL = process.env.GROQ_TTS_MODEL || 'playai-tts';
 
-if (ELEVENLABS_API_KEY) {
-  // Log masked API key for verification (first 10 and last 4 chars)
-  const maskedKey = ELEVENLABS_API_KEY.length > 14
-    ? `${ELEVENLABS_API_KEY.substring(0, 10)}...${ELEVENLABS_API_KEY.substring(ELEVENLABS_API_KEY.length - 4)}`
-    : '***';
-  console.log(`✅ ElevenLabs API key configured (${maskedKey})`);
-} else {
-  console.warn('⚠️  ElevenLabs API key not found. Text-to-speech disabled.');
-}
+console.log(`✅ Groq TTS configured with voice: ${GROQ_TTS_VOICE}, model: ${GROQ_TTS_MODEL}`);
 
 // Helper function to call Groq API
 async function callGroqAPI(messages, options = {}) {
@@ -269,12 +287,12 @@ app.get('/stats', async (req, res) => {
   }
 });
 
-// Text-to-Speech endpoint using direct REST API
+// Text-to-Speech endpoint using Groq API
 app.post('/text-to-speech', async (req, res) => {
   console.log('📥 TTS request received');
 
-  if (!ELEVENLABS_API_KEY) {
-    console.error('❌ ElevenLabs not configured');
+  if (!API_KEY) {
+    console.error('❌ Groq API key not configured');
     return res.status(503).json({ error: 'Text-to-speech not configured' });
   }
 
@@ -286,76 +304,41 @@ app.post('/text-to-speech', async (req, res) => {
       return res.status(400).json({ error: 'Text is required' });
     }
 
-    // Limit text length to prevent abuse and quota exhaustion
-    if (text.length > 5000) {
+    // Limit text length to prevent abuse
+    if (text.length > 4096) {
       console.error('❌ Text too long:', text.length);
-      return res.status(400).json({ error: 'Text too long (max 5000 characters)' });
+      return res.status(400).json({ error: 'Text too long (max 4096 characters)' });
     }
 
-    // AGGRESSIVE quota management - send only minimal essential text
-    let optimizedText = text;
-    
-    // Always optimize text to prevent quota issues - be very conservative
-    if (text.length > 200) {
-      console.log('📝 Applying aggressive TTS optimization for quota protection...');
-      
-      // Extract only the most critical summary (first sentence or two)
-      const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 0);
-      if (sentences.length > 0) {
-        optimizedText = sentences[0].trim() + '.';
-        
-        // If still too long, truncate further
-        if (optimizedText.length > 150) {
-          optimizedText = optimizedText.substring(0, 147) + '...';
-        }
-        
-        console.log(`✂️ Aggressively optimized text from ${text.length} to ${optimizedText.length} characters`);
-      } else {
-        // Fallback: just take first 100 characters
-        optimizedText = text.substring(0, 97) + '...';
-      }
-    }
-    
-    // Ultra-conservative final safety check
-    if (optimizedText.length > 150) {
-      optimizedText = optimizedText.substring(0, 147) + '...';
-    }
-
-    console.log(`🔊 Generating speech for ${optimizedText.length} characters (original: ${text.length})...`);
+    console.log(`🔊 Generating speech for ${text.length} characters...`);
     console.log(`📝 Text preview: "${text.substring(0, 100)}..."`);
-    console.log(`🎤 Voice ID: ${ELEVENLABS_VOICE_ID}`);
+    console.log(`🎤 Voice: ${GROQ_TTS_VOICE}`);
 
-    // Use direct REST API instead of SDK
-    console.log('Calling ElevenLabs REST API...');
+    // Call Groq TTS API
+    console.log('Calling Groq TTS API...');
 
-    const elevenLabsUrl = `https://api.elevenlabs.io/v1/text-to-speech/${ELEVENLABS_VOICE_ID}`;
+    const groqTtsUrl = 'https://api.groq.com/openai/v1/audio/speech';
 
-    const elevenLabsResponse = await fetch(elevenLabsUrl, {
+    const groqResponse = await fetch(groqTtsUrl, {
       method: 'POST',
       headers: {
-        'Accept': 'audio/mpeg',
-        'Content-Type': 'application/json',
-        'xi-api-key': ELEVENLABS_API_KEY
+        'Authorization': `Bearer ${API_KEY}`,
+        'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        text: optimizedText,
-        model_id: 'eleven_turbo_v2_5',
-        voice_settings: {
-          stability: 0.5,
-          similarity_boost: 0.75,
-          style: 0.0,
-          use_speaker_boost: true
-        }
+        model: GROQ_TTS_MODEL,
+        input: text,
+        voice: GROQ_TTS_VOICE,
+        response_format: 'mp3'
       })
     });
 
-    console.log('📡 ElevenLabs response status:', elevenLabsResponse.status);
+    console.log('📡 Groq TTS response status:', groqResponse.status);
 
-    if (!elevenLabsResponse.ok) {
-      const errorText = await elevenLabsResponse.text();
-      console.error('❌ ElevenLabs API Error:', errorText);
+    if (!groqResponse.ok) {
+      const errorText = await groqResponse.text();
+      console.error('❌ Groq TTS API Error:', errorText);
 
-      // Parse error to check for quota issues
       let errorDetails;
       try {
         errorDetails = JSON.parse(errorText);
@@ -363,25 +346,14 @@ app.post('/text-to-speech', async (req, res) => {
         errorDetails = { message: errorText };
       }
 
-      // Handle quota exceeded gracefully
-      if (errorDetails.detail?.status === 'quota_exceeded' || errorText.includes('quota_exceeded')) {
-        console.warn('⚠️  ElevenLabs quota exceeded. Returning error response.');
-        return res.status(402).json({
-          error: 'Text-to-speech quota exceeded',
-          details: errorDetails.detail?.message || 'Your ElevenLabs API quota has been exceeded. Please upgrade your plan or wait for quota reset.',
-          quota_exceeded: true
-        });
-      }
-
-      // Handle other API errors
-      return res.status(elevenLabsResponse.status).json({
+      return res.status(groqResponse.status).json({
         error: 'Text-to-speech service unavailable',
-        details: errorDetails.detail?.message || errorDetails.message || 'ElevenLabs API returned an error',
-        status_code: elevenLabsResponse.status
+        details: errorDetails.error?.message || errorDetails.message || 'Groq TTS API returned an error',
+        status_code: groqResponse.status
       });
     }
 
-    const audioBuffer = Buffer.from(await elevenLabsResponse.arrayBuffer());
+    const audioBuffer = Buffer.from(await groqResponse.arrayBuffer());
 
     console.log(`✅ Generated ${audioBuffer.length} bytes of audio`);
 

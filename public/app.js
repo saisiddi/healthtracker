@@ -115,6 +115,12 @@ function clearUIState() {
   listenBtn.classList.remove('playing');
   listenText.textContent = 'Listen';
   listenBtn.disabled = false;
+  
+  // Remove TTS setup banner if present
+  const setupBanner = document.querySelector('.tts-setup-banner');
+  if (setupBanner) {
+    setupBanner.remove();
+  }
 
   // Clear preview
   preview.classList.add('hidden');
@@ -210,6 +216,46 @@ async function generateSpeech(analysisText) {
 
     if (!response.ok) {
       const errorData = await response.json();
+      
+      // Check if it's a terms acceptance error
+      if (errorData.details && errorData.details.includes('terms acceptance')) {
+        // Show helpful banner instead of popup
+        setStatus('⚠️ One-time setup needed: Accept PlayAI TTS terms in Groq Console, then try again (no restart needed)', true);
+        listenBtn.disabled = false;
+        listenBtn.classList.remove('loading', 'playing');
+        listenText.textContent = 'Setup Required';
+        
+        // Create a help banner with a link
+        const helpBanner = document.createElement('div');
+        helpBanner.style.cssText = `
+          background: #fef3c7;
+          border: 2px solid #f59e0b;
+          border-radius: 8px;
+          padding: 16px;
+          margin: 16px 0;
+          font-size: 14px;
+          line-height: 1.6;
+        `;
+        helpBanner.innerHTML = `
+          <strong>🔧 Audio Setup Required (One-Time)</strong><br>
+          To enable text-to-speech, you need to accept PlayAI TTS terms in Groq Console.<br><br>
+          <strong>Steps:</strong><br>
+          1. <a href="https://console.groq.com/playground?model=playai-tts" target="_blank" style="color: #2563eb; text-decoration: underline;">Click here to open Groq Console</a><br>
+          2. Accept the PlayAI TTS terms when prompted<br>
+          3. Come back and click "Listen" again - it will work immediately!<br><br>
+          <small>💡 After accepting terms, audio will generate automatically in this webapp. No more redirects or manual steps!</small>
+        `;
+        
+        // Insert banner after summary text
+        const summaryCard = summaryText.closest('.card');
+        if (summaryCard && !document.querySelector('.tts-setup-banner')) {
+          helpBanner.className = 'tts-setup-banner';
+          summaryCard.insertAdjacentElement('afterend', helpBanner);
+        }
+        
+        return;
+      }
+      
       throw new Error(errorData.error || `HTTP ${response.status}`);
     }
 
@@ -219,49 +265,86 @@ async function generateSpeech(analysisText) {
     if (audioBlob.size === 0) {
       throw new Error('Received empty audio file');
     }
+    
+    // Remove setup banner if it exists (TTS is now working!)
+    const setupBanner = document.querySelector('.tts-setup-banner');
+    if (setupBanner) {
+      setupBanner.remove();
+      console.log('✅ Removed setup banner - TTS is now working!');
+    }
 
     // PROPER AUDIO SETUP - CLEAR AND DIRECT PLAYBACK
     console.log('🎵 Setting up audio for immediate playback...');
     setStatus('🎵 Preparing audio playback...');
     
     const audioUrl = URL.createObjectURL(audioBlob);
-    
+
     // Completely reset audio element
-    audioPlayer.pause();
+    try { audioPlayer.pause(); } catch {}
     audioPlayer.currentTime = 0;
-    audioPlayer.src = '';
+    audioPlayer.volume = 1.0;
+    audioPlayer.muted = false;
     audioPlayer.removeAttribute('src');
     audioPlayer.load();
-    
-    // Set new audio source
+
+    // Set new audio source and show controls
     audioPlayer.src = audioUrl;
-    audioPlayer.load();
     audioPlayerContainer.classList.remove('hidden');
-    
-    // Setup ONE-TIME event listener for immediate playback
-    const playWhenReady = async () => {
-      console.log('✅ Audio completely loaded and ready');
+
+    // Robust play routine with multiple fallbacks
+    const tryPlay = async (label) => {
       try {
+        console.log(`▶️ Attempting play (${label})...`);
         setStatus('🔊 Playing audio summary...');
         await audioPlayer.play();
-        
         listenBtn.classList.add('playing');
         listenText.textContent = 'Playing...';
         listenBtn.disabled = false;
-        
         console.log('✅ Audio playing successfully!');
-      } catch (playError) {
-        console.log('⚠️ Auto-play blocked - user interaction required');
-        listenBtn.disabled = false;
-        listenBtn.classList.remove('playing');
-        listenText.textContent = 'Click to Play';
-        setStatus('Audio ready - click Listen button to play');
+        return true;
+      } catch (e) {
+        console.warn(`⏸️ Play attempt failed (${label}):`, e?.message || e);
+        return false;
       }
-      // Remove the event listener after use
-      audioPlayer.removeEventListener('canplaythrough', playWhenReady);
     };
-    
-    audioPlayer.addEventListener('canplaythrough', playWhenReady);
+
+    // 1) Immediate play on user gesture
+    let played = await tryPlay('immediate');
+
+    // 2) If not, wait for loadedmetadata then play
+    if (!played) {
+      await new Promise((resolve) => {
+        const onMeta = async () => {
+          audioPlayer.removeEventListener('loadedmetadata', onMeta);
+          played = await tryPlay('loadedmetadata');
+          resolve();
+        };
+        audioPlayer.addEventListener('loadedmetadata', onMeta, { once: true });
+        // Force load to trigger events
+        audioPlayer.load();
+      });
+    }
+
+    // 3) If still not, wait for canplaythrough
+    if (!played) {
+      await new Promise((resolve) => {
+        const onReady = async () => {
+          audioPlayer.removeEventListener('canplaythrough', onReady);
+          played = await tryPlay('canplaythrough');
+          resolve();
+        };
+        audioPlayer.addEventListener('canplaythrough', onReady, { once: true });
+      });
+    }
+
+    // 4) Final fallback: enable manual play
+    if (!played) {
+      console.log('⚠️ Auto-play blocked or audio not ready. Enabling manual play.');
+      listenBtn.disabled = false;
+      listenBtn.classList.remove('playing');
+      listenText.textContent = 'Click to Play';
+      setStatus('Audio ready - click Listen button to play');
+    }
     
     // Enhanced event handlers for audio playback
     audioPlayer.onended = () => {
