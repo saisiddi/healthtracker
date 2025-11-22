@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MedInsight AI - Premium Medical Analysis</title>
+  <link rel="stylesheet" href="/styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <!-- Animated background -->
+  <div class="bg-gradient"></div>
+  <div class="bg-pattern"></div>
+  
+  <!-- Hero Landing Page -->
+  <section id="heroSection" class="hero-section">
+    <div class="hero-content">
+      <div class="hero-logo">
+        <svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect width="80" height="80" rx="20" fill="url(#hero-logo-gradient)"/>
+          <path d="M40 20v40M20 40h40" stroke="white" stroke-width="4" stroke-linecap="round"/>
+          <circle cx="40" cy="40" r="8" fill="white"/>
+          <defs>
+            <linearGradient id="hero-logo-gradient" x1="0" y1="0" x2="80" y2="80">
+              <stop stop-color="#0ea5e9"/>
+              <stop offset="1" stop-color="#06b6d4"/>
+            </linearGradient>
+          </defs>
+        </svg>
+      </div>
+      
+      <h1 class="hero-title">MedInsight AI</h1>
+      <div class="hero-badge">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+          <path d="M13 10V3L4 14h7v7l9-11h-7z" fill="currentColor"/>
+        </svg>
+        Powered by Advanced AI
+      </div>
+      
+      <p class="hero-description">
+        Get instant, comprehensive analysis of your medical images
+        <br/>
+        X-rays • Blood Tests • Prescriptions
+      </p>
+      
+      <div class="hero-features">
+        <div class="feature-item">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span>Instant Analysis</span>
+        </div>
+        <div class="feature-item">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span>100% Private</span>
+        </div>
+        <div class="feature-item">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+            <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span>Detailed Reports</span>
+        </div>
+      </div>
+      
+      <button id="getStartedBtn" class="hero-btn">
+        <span class="hero-btn-text">Get Started</span>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" class="hero-btn-icon">
+          <path d="M13 7l5 5m0 0l-5 5m5-5H6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span class="hero-btn-shimmer"></span>
+      </button>
+      
+      <div class="hero-info">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+          <path d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        No data stored • Results are not medical diagnosis
+      </div>
+      
+      <!-- Scroll indicator -->
+      <div class="scroll-indicator">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <path d="M7 13l5 5m0 0l5-5m-5 5V6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Features Showcase Section -->
+  <section id="featuresSection" class="features-showcase">
+    <div class="features-container">
+      <!-- Section Header -->
+      <div class="features-header">
+        <div class="features-subtitle">Why Choose MedInsight AI</div>
+        <h2 class="features-title">Advanced Medical Analysis<br/>Powered by Cutting-Edge AI</h2>
+        <p class="features-description">Experience the future of medical image interpretation with our state-of-the-art AI technology</p>
+      </div>
+      
+      <!-- Feature Grid -->
+      <div class="features-grid">
+        <!-- Feature 1 -->
+        <div class="feature-card" data-aos="fade-up">
+          <div class="feature-icon-wrapper">
+            <div class="feature-icon-bg"></div>
+            <svg class="feature-icon" width="40" height="40" viewBox="0 0 24 24" fill="none">
+              <path d="M13 10V3L4 14h7v7l9-11h-7z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <h3 class="feature-card-title">Lightning Fast Analysis</h3>
+          <p class="feature-card-text">Get comprehensive medical image analysis in seconds, not hours. Our AI processes X-rays, blood tests, and prescriptions instantly with professional-grade accuracy.</p>
+          <div class="feature-stats">
+            <div class="stat-item">
+              <span class="stat-number">&lt;10s</span>
+              <span class="stat-label">Average Analysis Time</span>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Feature 2 -->
+        <div class="feature-card" data-aos="fade-up" data-aos-delay="100">
+          <div class="feature-icon-wrapper">
+            <div class="feature-icon-bg"></div>
+            <svg class="feature-icon" width="40" height="40" viewBox="0 0 24 24" fill="none">
+              <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <h3 class="feature-card-title">Comprehensive Reports</h3>
+          <p class="feature-card-text">Receive detailed, easy-to-understand reports with 8-12 specific findings, measurements, and clinical context. Every value is explained with reference ranges.</p>
+          <div class="feature-stats">
+            <div class="stat-item">
+              <span class="stat-number">12+</span>
+              <span class="stat-label">Data Points Analyzed</span>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Feature 3 -->
+        <div class="feature-card" data-aos="fade-up" data-aos-delay="200">
+          <div class="feature-icon-wrapper">
+            <div class="feature-icon-bg"></div>
+            <svg class="feature-icon" width="40" height="40" viewBox="0 0 24 24" fill="none">
+              <path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <h3 class="feature-card-title">100% Private & Secure</h3>
+          <p class="feature-card-text">Your medical data never leaves your session. We don't store any images or results. Everything is processed in real-time and immediately discarded.</p>
+          <div class="feature-stats">
+            <div class="stat-item">
+              <span class="stat-number">0</span>
+              <span class="stat-label">Data Stored</span>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Feature 4 -->
+        <div class="feature-card" data-aos="fade-up">
+          <div class="feature-icon-wrapper">
+            <div class="feature-icon-bg"></div>
+            <svg class="feature-icon" width="40" height="40" viewBox="0 0 24 24" fill="none">
+              <path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <h3 class="feature-card-title">Medical-Grade AI</h3>
+          <p class="feature-card-text">Powered by advanced Llama 4 vision models trained on medical data. Our AI provides detailed interpretations with clinical accuracy and context.</p>
+          <div class="feature-stats">
+            <div class="stat-item">
+              <span class="stat-number">90B+</span>
+              <span class="stat-label">AI Parameters</span>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Feature 5 -->
+        <div class="feature-card" data-aos="fade-up" data-aos-delay="100">
+          <div class="feature-icon-wrapper">
+            <div class="feature-icon-bg"></div>
+            <svg class="feature-icon" width="40" height="40" viewBox="0 0 24 24" fill="none">
+              <path d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M9 12h6m-6 4h6m-6-8h1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <h3 class="feature-card-title">Advanced OCR Technology</h3>
+          <p class="feature-card-text">Extract every piece of text from your medical documents with precision. Medication names, dosages, lab values - all captured and analyzed accurately.</p>
+          <div class="feature-stats">
+            <div class="stat-item">
+              <span class="stat-number">99%+</span>
+              <span class="stat-label">Text Accuracy</span>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Feature 6 -->
+        <div class="feature-card" data-aos="fade-up" data-aos-delay="200">
+          <div class="feature-icon-wrapper">
+            <div class="feature-icon-bg"></div>
+            <svg class="feature-icon" width="40" height="40" viewBox="0 0 24 24" fill="none">
+              <path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <h3 class="feature-card-title">Smart Severity Detection</h3>
+          <p class="feature-card-text">Automatically categorizes findings into green (normal), yellow (monitor), or red (urgent) with clear recommendations for each severity level.</p>
+          <div class="feature-stats">
+            <div class="stat-item">
+              <span class="stat-number">3-Tier</span>
+              <span class="stat-label">Severity System</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Call to Action -->
+      <div class="features-cta" data-aos="fade-up">
+        <h3 class="cta-title">Ready to analyze your medical images?</h3>
+        <p class="cta-text">Join thousands of users who trust MedInsight AI for instant medical image analysis</p>
+        <button id="ctaStartBtn" class="hero-btn">
+          <span class="hero-btn-text">Start Your Analysis</span>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" class="hero-btn-icon">
+            <path d="M13 7l5 5m0 0l-5 5m5-5H6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span class="hero-btn-shimmer"></span>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <main class="container">
+    <!-- Upload Section (Collapsible) -->
+    <section id="uploadSection" class="card upload-card">
+      <div class="card-header">
+        <h2 class="card-title">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" class="card-icon-svg">
+            <path d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Upload Medical Image
+        </h2>
+        <div class="card-subtitle">Select type and upload your medical image for comprehensive AI analysis</div>
+      </div>
+
+      <div class="controls">
+        <label for="modality" class="label">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" class="label-icon-svg">
+            <path d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Image Type
+        </label>
+        <div class="select-wrapper">
+          <select id="modality" class="select" required>
+            <option value="" disabled selected>Choose image type...</option>
+            <option value="xray">X-ray Scan</option>
+            <option value="blood_test">Blood Test Report</option>
+            <option value="prescription">Prescription</option>
+          </select>
+          <svg class="select-arrow" width="12" height="8" viewBox="0 0 12 8" fill="none">
+            <path d="M1 1.5L6 6.5L11 1.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      </div>
+
+      <div id="dropzone" class="dropzone">
+        <div class="dropzone-inner">
+          <div class="drop-icon-wrapper">
+            <svg class="drop-icon" width="64" height="64" viewBox="0 0 64 64" fill="none">
+              <circle cx="32" cy="32" r="30" stroke="url(#icon-gradient)" stroke-width="2" stroke-dasharray="4 4"/>
+              <path d="M32 20v24M20 32h24" stroke="url(#icon-gradient)" stroke-width="3" stroke-linecap="round"/>
+              <defs>
+                <linearGradient id="icon-gradient" x1="0" y1="0" x2="64" y2="64">
+                  <stop stop-color="#0ea5e9"/>
+                  <stop offset="1" stop-color="#06b6d4"/>
+                </linearGradient>
+              </defs>
+            </svg>
+          </div>
+          <div class="drop-title">Drop your image here</div>
+          <div class="drop-subtitle">or click to browse</div>
+          <div class="drop-formats">Supports: PNG, JPG, JPEG (Max 4MB)</div>
+        </div>
+        <input id="fileInput" type="file" accept="image/*" hidden />
+      </div>
+
+      <div id="preview" class="preview hidden">
+        <div class="preview-wrapper">
+          <img id="previewImg" alt="Preview" />
+          <div class="preview-overlay">
+            <button id="changeImageBtn" class="btn-icon" title="Change image">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+                <path d="M13.5 6.5l2-2m0 0l2 2m-2-2v5.5M10 17.5A7.5 7.5 0 1110 2.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+        <div class="preview-actions">
+          <button id="analyzeBtn" class="btn primary">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" class="btn-icon-left">
+              <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Analyze Image
+            <span class="btn-shimmer"></span>
+          </button>
+          <button id="resetBtn" class="btn secondary">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" class="btn-icon-left">
+              <path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Reset
+          </button>
+        </div>
+      </div>
+
+      <div id="status" class="status"></div>
+      
+      <!-- Loading animation -->
+      <div id="loadingAnimation" class="loading-animation hidden">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">Analyzing medical image with AI...</div>
+        <div class="loading-subtext">This may take a few moments</div>
+        <div class="loading-progress">
+          <div class="loading-progress-bar"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Results Section -->
+    <section id="resultSection" class="card result-card hidden">
+      <div class="card-header">
+        <div class="header-with-actions">
+          <h2 class="card-title">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" class="card-icon-svg">
+              <path d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Comprehensive Analysis Results
+          </h2>
+          <button id="newAnalysisBtn" class="btn-text">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+              <path d="M12 4v16m8-8H4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            New Analysis
+          </button>
+        </div>
+      </div>
+
+      <div class="result-header">
+        <div class="severity-indicator">
+          <div id="severityDot" class="severity-dot"></div>
+          <div class="severity-info">
+            <div id="severityLabel" class="severity-label">—</div>
+            <div id="modalityLabel" class="modality-label">—</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="result-body">
+        <!-- Quick Stats -->
+        <div class="result-section stats-section">
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-icon">🎯</div>
+              <div class="stat-label">Confidence</div>
+              <div id="confidenceValue" class="stat-value">—</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon">⏱️</div>
+              <div class="stat-label">Analysis Time</div>
+              <div id="analysisTime" class="stat-value">—</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-icon">📋</div>
+              <div class="stat-label">Items Found</div>
+              <div id="itemsCount" class="stat-value">—</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Executive Summary -->
+        <div class="result-section">
+          <h3 class="result-section-title">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" class="section-icon-svg">
+              <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Executive Summary
+          </h3>
+          <div class="summary-card">
+            <p id="summaryText" class="result-text">—</p>
+          </div>
+        </div>
+
+        <!-- Key Findings -->
+        <div class="result-section">
+          <h3 class="result-section-title">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" class="section-icon-svg">
+              <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Detailed Findings
+          </h3>
+          <div class="findings-container">
+            <ul id="detailsList" class="result-list"></ul>
+          </div>
+        </div>
+
+        <!-- Recommendations -->
+        <div class="result-section">
+          <h3 class="result-section-title">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" class="section-icon-svg">
+              <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Recommended Actions
+          </h3>
+          <div class="actions-container">
+            <ul id="actionsList" class="result-list actions-list"></ul>
+          </div>
+        </div>
+
+        <!-- Important Notes -->
+        <div id="notesSection" class="result-section notes-section hidden">
+          <h3 class="result-section-title">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" class="section-icon-svg">
+              <path d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Important Notes
+          </h3>
+          <div id="notesContent" class="notes-content"></div>
+        </div>
+
+        <!-- Extracted Text -->
+        <div id="ocrSection" class="result-section hidden">
+          <h3 class="result-section-title">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" class="section-icon-svg">
+              <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Extracted Text (OCR)
+          </h3>
+          <div class="ocr-wrapper">
+            <button id="copyOcrBtn" class="btn-copy">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                <path d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              Copy
+            </button>
+            <pre id="ocrText" class="ocr"></pre>
+          </div>
+        </div>
+
+        <!-- Medical Disclaimer -->
+        <div class="disclaimer">
+          <div class="disclaimer-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="disclaimer-content">
+            <strong>Medical Disclaimer</strong>
+            <span id="disclaimerText">This is an AI-generated analysis and not a medical diagnosis. Always consult a qualified healthcare professional for medical advice.</span>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Landing Page Footer -->
+  <footer id="landingFooter" class="landing-footer">
+    <div class="footer-container">
+      <div class="footer-grid">
+        <!-- Brand Column -->
+        <div class="footer-column footer-brand">
+          <div class="footer-logo">
+            <svg width="48" height="48" viewBox="0 0 80 80" fill="none">
+              <rect width="80" height="80" rx="16" fill="url(#footer-logo-gradient)"/>
+              <path d="M40 20v40M20 40h40" stroke="white" stroke-width="4" stroke-linecap="round"/>
+              <circle cx="40" cy="40" r="8" fill="white"/>
+              <defs>
+                <linearGradient id="footer-logo-gradient" x1="0" y1="0" x2="80" y2="80">
+                  <stop stop-color="#0ea5e9"/>
+                  <stop offset="1" stop-color="#06b6d4"/>
+                </linearGradient>
+              </defs>
+            </svg>
+            <div>
+              <div class="footer-brand-name">MedInsight AI</div>
+              <div class="footer-brand-tagline">Medical Intelligence, Instantly</div>
+            </div>
+          </div>
+          <p class="footer-brand-description">
+            Advanced AI-powered medical image analysis providing instant, comprehensive insights for X-rays, blood tests, and prescriptions.
+          </p>
+          <div class="footer-badges">
+            <div class="footer-badge-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                <path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" stroke="currentColor" stroke-width="2"/>
+              </svg>
+              <span>100% Private</span>
+            </div>
+            <div class="footer-badge-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                <path d="M13 10V3L4 14h7v7l9-11h-7z" stroke="currentColor" stroke-width="2"/>
+              </svg>
+              <span>Instant Results</span>
+            </div>
+            <div class="footer-badge-item">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" stroke-width="2"/>
+              </svg>
+              <span>Medical Grade</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Features Column -->
+        <div class="footer-column">
+          <h4 class="footer-heading">Features</h4>
+          <ul class="footer-links">
+            <li><a href="#" class="footer-link">X-ray Analysis</a></li>
+            <li><a href="#" class="footer-link">Blood Test Reports</a></li>
+            <li><a href="#" class="footer-link">Prescription Reading</a></li>
+            <li><a href="#" class="footer-link">OCR Technology</a></li>
+            <li><a href="#" class="footer-link">Severity Detection</a></li>
+          </ul>
+        </div>
+
+        <!-- Resources Column -->
+        <div class="footer-column">
+          <h4 class="footer-heading">Resources</h4>
+          <ul class="footer-links">
+            <li><a href="#" class="footer-link">How It Works</a></li>
+            <li><a href="#" class="footer-link">Accuracy & Safety</a></li>
+            <li><a href="#" class="footer-link">Privacy Policy</a></li>
+            <li><a href="#" class="footer-link">Terms of Service</a></li>
+            <li><a href="#" class="footer-link">FAQ</a></li>
+          </ul>
+        </div>
+
+        <!-- Support Column -->
+        <div class="footer-column">
+          <h4 class="footer-heading">Support</h4>
+          <ul class="footer-links">
+            <li><a href="#" class="footer-link">Help Center</a></li>
+            <li><a href="#" class="footer-link">Contact Us</a></li>
+            <li><a href="#" class="footer-link">Report Issue</a></li>
+            <li><a href="#" class="footer-link">Feedback</a></li>
+            <li><a href="#" class="footer-link">Documentation</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Footer Bottom -->
+      <div class="footer-bottom">
+        <div class="footer-bottom-left">
+          <p class="footer-copyright">© 2024 MedInsight AI. All rights reserved.</p>
+          <p class="footer-disclaimer">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+              <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" stroke="currentColor" stroke-width="2"/>
+            </svg>
+            Not a substitute for professional medical diagnosis
+          </p>
+        </div>
+        <div class="footer-bottom-right">
+          <div class="footer-social">
+            <a href="#" class="social-link" aria-label="Twitter">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M23 3a10.9 10.9 0 01-3.14 1.53 4.48 4.48 0 00-7.86 3v1A10.66 10.66 0 013 4s-4 9 5 13a11.64 11.64 0 01-7 2c9 5 20 0 20-11.5a4.5 4.5 0 00-.08-.83A7.72 7.72 0 0023 3z"/>
+              </svg>
+            </a>
+            <a href="#" class="social-link" aria-label="GitHub">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.17 6.839 9.49.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.603-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.463-1.11-1.463-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.831.092-.646.35-1.086.636-1.336-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0112 6.836c.85.004 1.705.114 2.504.336 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.167 22 16.418 22 12c0-5.523-4.477-10-10-10z"/>
+              </svg>
+            </a>
+            <a href="#" class="social-link" aria-label="LinkedIn">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+              </svg>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Workflow Footer (Simple) -->
+  <footer id="workflowFooter" class="workflow-footer hidden">
+    <div class="footer-content">
+      <div class="footer-badge">🔒 Secure & Private</div>
+      <div class="footer-text">No data is stored. All analysis is performed in real-time.</div>
+    </div>
+  </footer>
+
+  <script src="/app.js"></script>
+</body>
+</html>
